@@ -2055,11 +2055,6 @@ def reproduce_ci_job(url, work_dir, interactive, gpg_url):
     ]
 
     inst_list = []
-    if not setup_result:
-        inst_list.append("    - Clone spack and acquire tested commit\n")
-        inst_list.append("{0}\n".format(spack_info))
-        inst_list.append("    Path to clone spack: {0}/spack\n\n".format(work_dir))
-
     # Finally, print out some instructions to reproduce the build
     if job_image:
         # Allow interactive
@@ -2106,10 +2101,11 @@ def reproduce_ci_job(url, work_dir, interactive, gpg_url):
                 "bash" if interactive else "",
             ]
         ]
-        process_command("docker_start", docker_command, work_dir, run=setup_result)
+        autostart = interactive and setup_result
+        process_command("docker_start", docker_command, work_dir, run=autostart)
 
-        if not setup_result:
-            inst_list.insert(0, "\nTo run the docker reproducer:\n\n")
+        if not autostart:
+            inst_list.append("\nTo run the docker reproducer:\n\n")
             inst_list.extend(
                 [
                     "    - Start the docker container install",
@@ -2119,12 +2115,18 @@ def reproduce_ci_job(url, work_dir, interactive, gpg_url):
     else:
         process_command("reproducer", entrypoint_script, work_dir, run=False)
 
-        inst_list.insert(0, "\nOnce on the tagged runner:\n\n")
+        inst_list.append("\nOnce on the tagged runner:\n\n")
         inst_list.extent(
-            ["    - Run the reproducer script" "       $ {0}/reproducer.sh".format(work_dir)]
+            ["    - Run the reproducer script", "       $ {0}/reproducer.sh".format(work_dir)]
         )
 
-    print("".join(inst_list))
+    if not setup_result:
+        inst_list.append("\n    - Clone spack and acquire tested commit")
+        inst_list.append("\n        {0}\n".format(spack_info))
+        inst_list.append("\n")
+        inst_list.append("\n        Path to clone spack: {0}/spack\n\n".format(work_dir))
+
+    tty.msg("".join(inst_list))
 
 
 def process_command(name, commands, repro_dir, run=True):

@@ -724,7 +724,7 @@ def ci_rebuild(args):
 
 \033[34mTo reproduce this build locally, run:
 
-    spack ci reproduce-build {0} [--working-dir <dir>]
+    spack ci reproduce-build {0} [--working-dir <dir>] [--interactive]
 
 If this project does not have public pipelines, you will need to first:
 
