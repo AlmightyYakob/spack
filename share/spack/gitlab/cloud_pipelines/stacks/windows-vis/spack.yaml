@@ -24,7 +24,7 @@ spack:
       version: [3.21.12] # newer protobuf have broken CMake support on Windows
 
   specs:
-  - paraview
+  - readline
 
   mirrors:
     mirror: "s3://spack-binaries/develop/windows-vis"
